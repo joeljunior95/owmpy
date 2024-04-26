@@ -3,8 +3,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from requests import request
 
-from owmpy.errors import InvalidAPIKeyException
-from owmpy.models import Geolocation, DaySummary
+from .errors import InvalidAPIKeyException
+from .models import Geolocation, DaySummary
 
 class OpenWeatherMap:
     def __init__(self, 

@@ -1,2 +1,2 @@
-from owmpy.api import OpenWeatherMap
-from owmpy.models import Geolocation, Temperature, DaySummary
+from .api import OpenWeatherMap
+from .models import Geolocation, Temperature, DaySummary
