@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from requests import request
 
-from .errors import GernericOWMException, InvalidAPIKeyException, OWMException, OWMServerException, RequestLimitException, SearchParamsException
+from .errors import GernericOWMException, InvalidAPIKeyException, EmptyGeoException, OWMException, OWMServerException, RequestLimitException, SearchParamsException
 from .models import Geolocation, DaySummary
 
 class OpenWeatherMap:
@@ -70,6 +70,35 @@ class OpenWeatherMap:
             jsonData = response.json()
             if len(jsonData) > 0:
                 data = jsonData[0]
+
+        status_code = response.status_code
+        match status_code:
+            case 200:
+                jsonData = response.json()
+                if len(jsonData) > 0:
+                    data = jsonData[0]
+                else:
+                    raise EmptyGeoException("Couldn't find a geolocation for the parameters informed")
+            case 401:
+                raise InvalidAPIKeyException(
+                    f"The API Key informed is not valid or is not activated yet. {response.status_code} {response.reason} {response.content}"
+                )
+            case 404:
+                raise SearchParamsException(
+                    f"The params informed incorrect. {response.status_code} {response.reason} {response.content}"
+                )
+            case 429:
+                raise RequestLimitException(
+                    f"You have exceeded the api calls limit of your plan. {response.status_code} {response.reason} {response.content}"
+                )
+            case 500 | 502 | 503 | 504:
+                raise OWMServerException(
+                    f"There's a problem with the OpenWeatherMap server. Please, contact them for more information. {response.status_code} {response.reason} {response.content}"
+                )
+            case _:
+                raise GernericOWMException(
+                    f"{response.status_code} {response.reason} {response.content}"
+                )
         
         self._geolocation = Geolocation(**data)
         return self._geolocation
@@ -140,6 +169,3 @@ class OpenWeatherMap:
 
 
         return daySummaryList
-    
-
-    

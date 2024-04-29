@@ -28,3 +28,8 @@ class OWMServerException(OWMException):
     """ Exeption raised when a valid API Key is not informed
     """
     pass
+
+class EmptyGeoException(OWMException):
+    """ Exeption raised when a valid API Key is not informed
+    """
+    pass
