@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from requests import request
 
-from .errors import GernericOWMException, InvalidAPIKeyException, OWMException, OWMServerException, ParamsException, RequestLimitException, SearchParamsException
+from .errors import GernericOWMException, InvalidAPIKeyException, OWMException, OWMServerException, RequestLimitException, SearchParamsException
 from .models import Geolocation, DaySummary
 
 class OpenWeatherMap:
