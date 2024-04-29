@@ -13,3 +13,6 @@ weather = OpenWeatherMap("<YOUR-API-KEY>",
 
 forecasts = weather.weather_info(None)
 ```
+
+The architecture of the solution:
+![architecture image](docs/architecture.png)

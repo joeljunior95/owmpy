@@ -4,8 +4,27 @@ class OWMException(Exception):
     """
     pass
 
-class InvalidAPIKeyException(Exception):
+class GernericOWMException(OWMException):
     """ Exeption raised when a valid API Key is not informed
     """
     pass
 
+class InvalidAPIKeyException(OWMException):
+    """ Exeption raised when a valid API Key is not informed
+    """
+    pass
+
+class SearchParamsException(OWMException):
+    """ Exeption raised when a valid API Key is not informed
+    """
+    pass
+
+class RequestLimitException(OWMException):
+    """ Exeption raised when a valid API Key is not informed
+    """
+    pass
+
+class OWMServerException(OWMException):
+    """ Exeption raised when a valid API Key is not informed
+    """
+    pass

@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from requests import request
 
-from .errors import InvalidAPIKeyException
+from .errors import GernericOWMException, InvalidAPIKeyException, OWMException, OWMServerException, ParamsException, RequestLimitException, SearchParamsException
 from .models import Geolocation, DaySummary
 
 class OpenWeatherMap:
@@ -12,11 +12,8 @@ class OpenWeatherMap:
                  location: str,
                  units: str = "metric",
                  lang: str = "pt_br"):
-        if api_key == "":
-            raise InvalidAPIKeyException(f"API Key informed is not valid:{api_key}")
-        else:
-            self.api_key = api_key
-        
+            
+        self.api_key = api_key
         self.city = ""
         self.state = ""
         self.country = ""
@@ -94,8 +91,30 @@ class OpenWeatherMap:
             "date": dt
         }
         response = request("get", url, params=params)
-        if response.status_code == 200:
-            data = response.json()
+        status_code = response.status_code
+        match status_code:
+            case 200:
+                data = response.json()
+            case 401:
+                raise InvalidAPIKeyException(
+                    f"The API Key informed is not valid or is not activated yet. {response.status_code} {response.reason} {response.content}"
+                )
+            case 404:
+                raise SearchParamsException(
+                    f"The params informed incorrect. {response.status_code} {response.reason} {response.content}"
+                )
+            case 429:
+                raise RequestLimitException(
+                    f"You have exceeded the api calls limit of your plan. {response.status_code} {response.reason} {response.content}"
+                )
+            case 500 | 502 | 503 | 504:
+                raise OWMServerException(
+                    f"There's a problem with the OpenWeatherMap server. Please, contact them for more information. {response.status_code} {response.reason} {response.content}"
+                )
+            case _:
+                raise GernericOWMException(
+                    f"{response.status_code} {response.reason} {response.content}"
+                )
         
         self._daySummary = DaySummary(**data)
         return self._daySummary
@@ -112,7 +131,7 @@ class OpenWeatherMap:
         else:
             self._date = date
 
-        day_loop = 1
+        day_loop = 0
         while day_loop <= days_forward:
             daySummaryList.append(self.daySummary)
 
